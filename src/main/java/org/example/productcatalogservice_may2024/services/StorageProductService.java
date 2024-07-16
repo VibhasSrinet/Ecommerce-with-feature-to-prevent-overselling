@@ -6,6 +6,9 @@ import org.example.productcatalogservice_may2024.repositories.CategoryRepo;
 import org.example.productcatalogservice_may2024.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,8 +25,12 @@ public class StorageProductService implements IProductService {
     private CategoryRepo categoryRepository;
 
     @Override
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public Page<Product> getAllProducts(int paageNumber, int pageSize, String sortBy, String sortOrder) {
+        Sort sort = Sort.by(sortBy).and(Sort.by("id").ascending());
+        if(sortOrder.equals("desc")) {
+            sort = sort.descending();
+        }
+        return productRepository.findAll(PageRequest.of(paageNumber, pageSize, sort));
     }
 
     @Override

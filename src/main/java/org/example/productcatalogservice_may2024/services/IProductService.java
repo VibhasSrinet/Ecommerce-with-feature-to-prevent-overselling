@@ -1,11 +1,13 @@
 package org.example.productcatalogservice_may2024.services;
 
 import org.example.productcatalogservice_may2024.models.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
 public interface IProductService {
-    List<Product> getAllProducts();
+    Page<Product> getAllProducts(int pageNumber, int pageSize, String sortBy, String sortOrder);
 
     Product getProductById(Long id);
 

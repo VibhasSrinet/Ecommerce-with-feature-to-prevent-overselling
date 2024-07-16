@@ -6,6 +6,10 @@ import org.example.productcatalogservice_may2024.models.Category;
 import org.example.productcatalogservice_may2024.models.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,8 +25,11 @@ public class FakeStoreProductService implements IProductService {
     @Autowired
     private FakeStoreClient fakeStoreClient;
 
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+
     @Override
-    public List<Product> getAllProducts() {
+    public Page<Product> getAllProducts(int pageNumber, int pageSize, String sortBy, String sortOrder) {
         FakeStoreProductDto[] fakeStoreProductDtos =
                 fakeStoreClient.getAllProducts();
         List<Product> products = new ArrayList<>();
@@ -30,12 +37,18 @@ public class FakeStoreProductService implements IProductService {
             products.add(getProduct(fakeStoreProductDto));
         }
 
-        return products;
+        return new PageImpl<>(products);
     }
 
     @Override
     public Product getProductById(Long productId) {
-        return getProduct(fakeStoreClient.getProduct(productId));
+        FakeStoreProductDto fakeStoreProductDto = null;
+        fakeStoreProductDto =  (FakeStoreProductDto) redisTemplate.opsForHash().get("product", productId);
+        if(fakeStoreProductDto == null) {
+            fakeStoreProductDto = fakeStoreClient.getProduct(productId);
+            redisTemplate.opsForHash().put("product", productId, fakeStoreProductDto);
+        }
+        return getProduct(fakeStoreProductDto);
     }
 
     @Override

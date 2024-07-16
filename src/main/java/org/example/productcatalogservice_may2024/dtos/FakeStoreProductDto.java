@@ -3,9 +3,11 @@ package org.example.productcatalogservice_may2024.dtos;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
-public class FakeStoreProductDto {
+public class FakeStoreProductDto implements Serializable {
     private String title;
     private Long id;
     private String description;

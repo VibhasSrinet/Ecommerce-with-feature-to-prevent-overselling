@@ -6,6 +6,8 @@ import org.example.productcatalogservice_may2024.models.Category;
 import org.example.productcatalogservice_may2024.models.Product;
 import org.example.productcatalogservice_may2024.services.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,12 +26,11 @@ public class ProductController {
     private IProductService productService;
 
     @GetMapping
-    public ResponseEntity<List<ProductDto>> getAllProducts() {
-        List<ProductDto> results = new ArrayList<>();
-        List<Product> products = productService.getAllProducts();
-        for (Product product : products) {
-            results.add(getProductDto(product));
-        }
+    public ResponseEntity<Page<ProductDto>> getAllProducts(@RequestParam int pageNumber, @RequestParam int pageSize,
+                                                           @RequestParam String sortBy, @RequestParam String sortOrder) {
+        Page<ProductDto> results = productService.getAllProducts(pageNumber, pageSize, sortBy, sortOrder)
+                .map(this::getProductDto);
+
         return ResponseEntity.ok(results);
     }
 
