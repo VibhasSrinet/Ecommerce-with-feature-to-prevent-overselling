@@ -18,4 +18,6 @@ public interface IProductService {
     Product deleteProduct(Long productId);
 
     Product updateProduct(Long productId, Product product);
+
+    Product getProductBasedOnScope(Long productId, Long userId);
 }

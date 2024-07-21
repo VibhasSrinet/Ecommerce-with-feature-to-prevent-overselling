@@ -27,6 +27,8 @@ public class Product extends BaseModel {
 
     private Integer quantity;
 
+    private Boolean isPrivate;
+
     @JsonManagedReference
     @ManyToOne(cascade = CascadeType.ALL)
     private Category category;

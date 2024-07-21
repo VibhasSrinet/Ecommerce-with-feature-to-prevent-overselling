@@ -1,5 +1,9 @@
 package org.example.productcatalogservice_may2024.services;
 
+import org.example.productcatalogservice_may2024.dtos.UserDto;
+import org.example.productcatalogservice_may2024.exceptions.InvalidRoleAccessException;
+import org.example.productcatalogservice_may2024.exceptions.ProductNotFoundException;
+import org.example.productcatalogservice_may2024.exceptions.UserNotFoundException;
 import org.example.productcatalogservice_may2024.models.Category;
 import org.example.productcatalogservice_may2024.models.Product;
 import org.example.productcatalogservice_may2024.repositories.CategoryRepo;
@@ -10,8 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,6 +27,9 @@ public class StorageProductService implements IProductService {
 
     @Autowired
     private CategoryRepo categoryRepository;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Override
     public Page<Product> getAllProducts(int paageNumber, int pageSize, String sortBy, String sortOrder) {
@@ -83,6 +90,23 @@ public class StorageProductService implements IProductService {
             return productRepository.save(existingProduct);
         }
         return null;
+    }
+
+    @Override
+    public Product getProductBasedOnScope(Long productId, Long userId) {
+        Product product = productRepository.findById(productId).orElse(null);
+        if(product==null){
+            throw new ProductNotFoundException("Product not found!");
+        }
+        UserDto userDto = restTemplate.getForEntity("http://userservice/users/{id}", UserDto.class, userId).getBody();
+        if(userDto==null) {
+            throw new UserNotFoundException("User not found!");
+        }
+
+        if(product.getIsPrivate()==true && !userDto.getRoles().contains("ADMIN")){
+            throw new InvalidRoleAccessException("User does not has access to this product!");
+        }
+        return product;
     }
 
     @Override

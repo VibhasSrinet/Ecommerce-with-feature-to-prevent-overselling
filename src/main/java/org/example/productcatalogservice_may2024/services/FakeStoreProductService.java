@@ -70,6 +70,11 @@ public class FakeStoreProductService implements IProductService {
         return getProduct(fakeStoreClient.updateProduct(productId,getFakeStoreProductDto(product)));
     }
 
+    @Override
+    public Product getProductBasedOnScope(Long productId, Long userId) {
+        return null;
+    }
+
 
     private Product getProduct(FakeStoreProductDto fakeStoreProductDto) {
         Product product = new Product();

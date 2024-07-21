@@ -53,6 +53,12 @@ public class ProductController {
         }
     }
 
+    @GetMapping("/{pid}/{uid}")
+    public ResponseEntity<ProductDto> getProductBasedOnScope(@PathVariable("pid") Long productId, @PathVariable("uid") Long userId) {
+        Product product = productService.getProductBasedOnScope(productId, userId);
+        return  new ResponseEntity<>(getProductDto(product), HttpStatus.OK);
+    }
+
     @PostMapping
     public ResponseEntity<ProductDto> createProduct(@RequestBody ProductDto productDto) {
         Product product = getProduct(productDto);
@@ -99,6 +105,8 @@ public class ProductController {
         product.setPrice(productDto.getPrice());
         product.setImageUrl(productDto.getImageUrl());
         product.setDescription(productDto.getDescription());
+        product.setQuantity(productDto.getQuantity());
+        product.setIsPrivate(productDto.getIsPrivate());
         if (productDto.getCategory() != null) {
             Category category = new Category();
             category.setId(productDto.getCategory().getId());
@@ -117,6 +125,7 @@ public class ProductController {
         productDto.setImageUrl(product.getImageUrl());
         productDto.setPrice(product.getPrice());
         productDto.setQuantity(product.getQuantity());
+        productDto.setIsPrivate(product.getIsPrivate());
         if (product.getCategory() != null) {
             CategoryDto categoryDto = new CategoryDto();
             categoryDto.setId(product.getCategory().getId());

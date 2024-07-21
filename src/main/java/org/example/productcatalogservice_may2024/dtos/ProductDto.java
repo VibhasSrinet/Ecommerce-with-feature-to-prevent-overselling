@@ -22,4 +22,7 @@ public class ProductDto {
     private CategoryDto category;
 
     private Integer quantity;
+
+    private Boolean isPrivate;
+
 }
